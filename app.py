@@ -22,5 +22,12 @@ def get_arg_currency():
 def arg_currency():
     return json.dumps(get_arg_currency())
 
+@app.route('/api/v1/argcurrency/csv')
+def arg_currency_csv():
+    values = get_arg_currency()
+    string = "compra,{compra}\n".format(compra=values['Compra'])
+    string += "venta,{venta}".format(venta=values['Venta'])
+    return string
+
 if __name__ == '__main__':
     app.run()
