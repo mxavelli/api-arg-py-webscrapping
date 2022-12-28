@@ -5,9 +5,7 @@ import json
 
 app = Flask(__name__)
 
-
-@app.route('/api/v1/argcurrency')
-def arg_currency():
+def get_arg_currency():
     kvalues = []
     keys = {'Compra', 'Venta'}
     website = 'https://dolarhoy.com/i/cotizaciones/dolar-blue'
@@ -18,9 +16,11 @@ def arg_currency():
     for i in getp:
         kvalues.append(i.get_text().replace('Compra', '').replace('Venta', ''))
     values = zip(keys, kvalues)
-    finalValues = dict(values)
-    return json.dumps(finalValues)
+    return dict(values)
 
+@app.route('/api/v1/argcurrency')
+def arg_currency():
+    return json.dumps(get_arg_currency())
 
 if __name__ == '__main__':
     app.run()
