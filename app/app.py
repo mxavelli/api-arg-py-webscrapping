@@ -5,9 +5,10 @@ import json
 
 app = Flask(__name__)
 
+
 def get_arg_currency():
     kvalues = []
-    keys = {'Compra', 'Venta'}
+    keys = {'Venta', 'Compra'}
     website = 'https://dolarhoy.com/i/cotizaciones/dolar-blue'
     request_web = requests.get(website)
     soup = BeautifulSoup(request_web.text, 'html.parser')
@@ -18,16 +19,19 @@ def get_arg_currency():
     values = zip(keys, kvalues)
     return dict(values)
 
-@app.route('/api/v1/argcurrency')
+
+@app.route('/api/v1/argcurrency', methods=['GET'])
 def arg_currency():
     return json.dumps(get_arg_currency())
 
-@app.route('/api/v1/argcurrency/csv')
+
+@app.route('/api/v1/argcurrency/csv', methods=['GET'])
 def arg_currency_csv():
     values = get_arg_currency()
-    string = "compra,{compra}\n".format(compra=values['Compra'])
-    string += "venta,{venta}".format(venta=values['Venta'])
+    string = 'compra,{}\n'.format(values['Compra'])
+    string += 'venta,{}'.format(values['Venta'])
     return string
+
 
 if __name__ == '__main__':
     app.run()
