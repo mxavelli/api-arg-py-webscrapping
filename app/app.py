@@ -7,17 +7,15 @@ app = Flask(__name__)
 
 
 def get_arg_currency():
-    kvalues = []
-    keys = {'Venta', 'Compra'}
+    values = {}
     website = 'https://dolarhoy.com/i/cotizaciones/dolar-blue'
     request_web = requests.get(website)
     soup = BeautifulSoup(request_web.text, 'html.parser')
-    getdiv = soup.body.div
-    getp = getdiv.find_all('p')
-    for i in getp:
-        kvalues.append(i.get_text().replace('Compra', '').replace('Venta', ''))
-    values = zip(keys, kvalues)
-    return dict(values)
+    get_p_elements = soup.body.div.find_all('p')
+    for p_element in get_p_elements:
+        span = p_element.span.extract()
+        values[span.get_text()] = float(p_element.get_text())
+    return values
 
 
 @app.route('/api/v1/argcurrency', methods=['GET'])
