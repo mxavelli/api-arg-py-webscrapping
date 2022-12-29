@@ -98,7 +98,7 @@ def get_brl_currency():
     xml_parsed = BeautifulSoup(request_web.text, 'html.parser')
     valor_convertido_element = xml_parsed.findChildren()
     value = valor_convertido_element[0].get_text()
-    values['value'] = value
+    values['value'] = float(value)
     insert_database(values, country_code_dict['BRL'])
     return values
 
