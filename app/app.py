@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from bs4 import BeautifulSoup
 from datetime import datetime, date
 import os
@@ -8,14 +9,15 @@ from re import sub
 import pymysql.cursors
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 
 def execute_query(query, params=[], should_return=False):
     connection = pymysql.connect(
         host=os.getenv('DB_HOST', 'localhost'),
         user=os.getenv('DB_USER', 'root'),
-        password=os.getenv('DB_PASS', 'test123'),
-        database=os.getenv('DB_NAME', 'dollar'),
+        password=os.getenv('DB_PASS', 'hola05'),
+        database=os.getenv('DB_NAME', 'dollar_currency'),
         cursorclass=pymysql.cursors.DictCursor
     )
     cursor = connection.cursor()
@@ -90,6 +92,7 @@ def get_arg_currency():
     insert_database(values, country_code_dict['ARG'])
     return values
 
+
 def get_brl_currency():
     values = {}
     date_now = date.today()
@@ -101,6 +104,7 @@ def get_brl_currency():
     values['value'] = float(value)
     insert_database(values, country_code_dict['BRL'])
     return values
+
 
 @app.route('/api/v1/argcurrency/json', methods=['GET'])
 def arg_currency_json():
@@ -125,6 +129,7 @@ def get_cop_csv():
     values = get_currency_from_table(country_code_dict['COP'])
     return convert_dict_to_csv(values)
 
+
 @app.route('/api/v1/brl/json', methods=['GET'])
 def get_brl_json():
     values = get_currency_from_table(country_code_dict['BRL'])
@@ -145,6 +150,7 @@ def arg_currency_update():
 @app.route('/api/v1/cop/update', methods=['GET'])
 def cop_update():
     return get_cop_currency()
+
 
 @app.route('/api/v1/brl/update', methods=['GET'])
 def brl_update():
