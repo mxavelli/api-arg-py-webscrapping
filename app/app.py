@@ -5,6 +5,12 @@ import json
 
 app = Flask(__name__)
 
+def convertDictToCsv(dict):
+    rows = []
+    for key in dict:
+        rows.append("{},{}".format(key, dict[key]))
+    return "\n".join(rows)
+
 
 def get_arg_currency():
     values = {}
@@ -25,10 +31,7 @@ def arg_currency():
 
 @app.route('/api/v1/argcurrency/csv', methods=['GET'])
 def arg_currency_csv():
-    values = get_arg_currency()
-    string = 'compra,{}\n'.format(values['Compra'])
-    string += 'venta,{}'.format(values['Venta'])
-    return string
+    return convertDictToCsv(get_arg_currency())
 
 
 if __name__ == '__main__':
