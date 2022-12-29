@@ -12,16 +12,13 @@ app = Flask(__name__)
 app.config['MYSQL_HOST'] = os.getenv('DB_HOST', 'localhost')
 app.config['MYSQL_USER'] = os.getenv('DB_USER', 'root')
 app.config['MYSQL_PASSWORD'] = os.getenv('DB_PASS', 'hola05')
-app.config['MYSQL_DB'] = os.getenv('DB_NAME', 'dollar_libre')
+app.config['MYSQL_DB'] = os.getenv('DB_NAME', 'dollar_currency')
 
 mysql = MySQL(app)
 
-
-def convert_dict_to_csv(dict_var):
-    rows = []
-    for key in dict_var:
-        rows.append("{},{}".format(key, dict_var[key]))
-    return "\n".join(rows)
+country_code_dict = {
+    'ARG': 'ARG'
+}
 
 
 def get_cop_currency():
@@ -39,6 +36,24 @@ def get_cop_currency():
     return values
 
 
+def convert_dict_to_csv(dict_var):
+    rows = []
+    for key in dict_var:
+        rows.append("{},{}".format(key, dict_var[key]))
+    return "\n".join(rows)
+
+
+def insert_database(jsonparam, country_code):
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO currency (json, country_code) VALUES (%s, %s)", [jsonparam, country_code])
+        mysql.connection.commit()
+        cur.close()
+        return jsonparam
+    except Exception as e:
+        return {'Status': 'Error', 'Detail': str(e)}
+
+
 def get_arg_currency():
     values = {}
     website = 'https://dolarhoy.com/i/cotizaciones/dolar-blue'
@@ -48,25 +63,15 @@ def get_arg_currency():
     for p_element in get_p_elements:
         span = p_element.span.extract()
         values[span.get_text()] = float(p_element.get_text())
+    values['date'] = str(date.today())
+    insert_database(json.dumps(values), country_code_dict['ARG'])
     return values
 
 
-def insert_database(jsonparam):
-    try:
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO dollar_libre.dollar (json) VALUES (%s)", [jsonparam])
-        mysql.connection.commit()
-        return jsonparam
-    except Exception as e:
-        return {'Status': 'Error', 'Detail': str(e)}
-
-
-@app.route('/api/v1/argcurrency', methods=['GET'])
-def arg_currency():
-    jsonCreated = get_arg_currency()
-    jsonCreated['date'] = str(date.today())
-    jsonInserted = json.dumps(jsonCreated)
-    return insert_database(jsonInserted)
+@app.route('/api/v1/argcurrency/json', methods=['GET'])
+def arg_currency_json():
+    values = get_arg_currency()
+    return json.dumps(values)
 
 
 @app.route('/api/v1/argcurrency/csv', methods=['GET'])
