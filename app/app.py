@@ -6,25 +6,28 @@ from re import sub
 
 app = Flask(__name__)
 
-def convert_dict_to_csv(dict):
+
+def convert_dict_to_csv(dict_var):
     rows = []
-    for key in dict:
-        rows.append("{},{}".format(key, dict[key]))
+    for key in dict_var:
+        rows.append("{},{}".format(key, dict_var[key]))
     return "\n".join(rows)
+
 
 def get_cop_currency():
     values = {}
     website = 'https://www.dolarhoy.co/'
     request_web = requests.get(website)
     soup = BeautifulSoup(request_web.text, 'html.parser')
-    h3Element = soup.find('h3', string="Precio en Casas de Cambio")
-    rowElement = h3Element.find_next_sibling()
-    colsElements = rowElement.findChildren('div')
-    for child in colsElements:
+    h3_element = soup.find('h3', string="Precio en Casas de Cambio")
+    row_element = h3_element.find_next_sibling()
+    cols_elements = row_element.findChildren('div')
+    for child in cols_elements:
         text = child.find('small').get_text()
         value = child.find('span').get_text()
         values[text] = float(sub("[^\d\.]", "", value))
     return values
+
 
 def get_arg_currency():
     values = {}
@@ -47,10 +50,12 @@ def arg_currency():
 def arg_currency_csv():
     return convert_dict_to_csv(get_arg_currency())
 
+
 @app.route('/api/v1/cop/json', methods=['GET'])
 def get_cop_json():
     values = get_cop_currency()
     return json.dumps(values)
+
 
 @app.route('/api/v1/cop/csv', methods=['GET'])
 def get_cop_csv():
