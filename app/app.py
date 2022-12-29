@@ -1,13 +1,19 @@
 from flask import Flask
 from bs4 import BeautifulSoup
 from datetime import datetime, date
+from re import sub
+import pymysql.cursors
 import os
 import requests
 import json
-from re import sub
-import pymysql.cursors
 
 app = Flask(__name__)
+
+country_code_dict = {
+    'ARG': 'ARG',
+    'COP': 'COP',
+    'BRL': 'BRL'
+}
 
 
 def execute_query(query, params=[], should_return=False):
@@ -23,15 +29,7 @@ def execute_query(query, params=[], should_return=False):
     connection.commit()
     if should_return:
         return cursor.fetchall()
-
     connection.close()
-
-
-country_code_dict = {
-    'ARG': 'ARG',
-    'COP': 'COP',
-    'BRL': 'BRL'
-}
 
 
 def insert_database(jsonparam, country_code):
@@ -70,7 +68,7 @@ def convert_dict_to_csv(dict_var):
 
 
 def get_currency_from_table(country_code):
-    query = "select json from currency where country_code='{}' order by id desc limit 1".format(country_code)
+    query = "SELECT json FROM currency WHERE country_code='{}' ORDER BY id DESC LIMIT 1".format(country_code)
     results = execute_query(
         query=query,
         should_return=True
@@ -90,6 +88,7 @@ def get_arg_currency():
     insert_database(values, country_code_dict['ARG'])
     return values
 
+
 def get_brl_currency():
     values = {}
     date_now = date.today()
@@ -101,6 +100,7 @@ def get_brl_currency():
     values['value'] = float(value)
     insert_database(values, country_code_dict['BRL'])
     return values
+
 
 @app.route('/api/v1/argcurrency/json', methods=['GET'])
 def arg_currency_json():
@@ -125,6 +125,7 @@ def get_cop_csv():
     values = get_currency_from_table(country_code_dict['COP'])
     return convert_dict_to_csv(values)
 
+
 @app.route('/api/v1/brl/json', methods=['GET'])
 def get_brl_json():
     values = get_currency_from_table(country_code_dict['BRL'])
@@ -145,6 +146,7 @@ def arg_currency_update():
 @app.route('/api/v1/cop/update', methods=['GET'])
 def cop_update():
     return get_cop_currency()
+
 
 @app.route('/api/v1/brl/update', methods=['GET'])
 def brl_update():
