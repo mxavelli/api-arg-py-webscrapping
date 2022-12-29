@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from bs4 import BeautifulSoup
 from datetime import datetime, date
 from re import sub
@@ -8,6 +9,7 @@ import requests
 import json
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 country_code_dict = {
     'ARG': 'ARG',
@@ -20,8 +22,8 @@ def execute_query(query, params=[], should_return=False):
     connection = pymysql.connect(
         host=os.getenv('DB_HOST', 'localhost'),
         user=os.getenv('DB_USER', 'root'),
-        password=os.getenv('DB_PASS', 'test123'),
-        database=os.getenv('DB_NAME', 'dollar'),
+        password=os.getenv('DB_PASS', 'hola05'),
+        database=os.getenv('DB_NAME', 'dollar_currency'),
         cursorclass=pymysql.cursors.DictCursor
     )
     cursor = connection.cursor()
