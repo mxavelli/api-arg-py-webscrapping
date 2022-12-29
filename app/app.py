@@ -126,13 +126,13 @@ def get_cop_csv():
     return convert_dict_to_csv(values)
 
 @app.route('/api/v1/brl/json', methods=['GET'])
-def get_cop_json():
+def get_brl_json():
     values = get_currency_from_table(country_code_dict['BRL'])
     return json.dumps(values)
 
 
 @app.route('/api/v1/brl/csv', methods=['GET'])
-def get_cop_csv():
+def get_brl_csv():
     values = get_currency_from_table(country_code_dict['BRL'])
     return convert_dict_to_csv(values)
 
@@ -147,7 +147,7 @@ def cop_update():
     return get_cop_currency()
 
 @app.route('/api/v1/brl/update', methods=['GET'])
-def cop_update():
+def brl_update():
     return get_brl_currency()
 
 
