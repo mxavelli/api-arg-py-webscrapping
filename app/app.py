@@ -6,7 +6,7 @@ from re import sub
 
 app = Flask(__name__)
 
-def convertDictToCsv(dict):
+def convert_dict_to_csv(dict):
     rows = []
     for key in dict:
         rows.append("{},{}".format(key, dict[key]))
@@ -45,7 +45,7 @@ def arg_currency():
 
 @app.route('/api/v1/argcurrency/csv', methods=['GET'])
 def arg_currency_csv():
-    return convertDictToCsv(get_arg_currency())
+    return convert_dict_to_csv(get_arg_currency())
 
 @app.route('/api/v1/cop/json', methods=['GET'])
 def get_cop_json():
@@ -54,7 +54,7 @@ def get_cop_json():
 
 @app.route('/api/v1/cop/csv', methods=['GET'])
 def get_cop_csv():
-    return convertDictToCsv(get_cop_currency())
+    return convert_dict_to_csv(get_cop_currency())
 
 
 if __name__ == '__main__':
