@@ -9,11 +9,6 @@ import pymysql.cursors
 
 app = Flask(__name__)
 
-app.config['MYSQL_HOST'] = os.getenv('DB_HOST', 'localhost')
-app.config['MYSQL_USER'] = os.getenv('DB_USER', 'root')
-app.config['MYSQL_PASSWORD'] = os.getenv('DB_PASS', 'hola05')
-app.config['MYSQL_DB'] = os.getenv('DB_NAME', 'dollar')
-
 
 def execute_query(query, params=[], should_return=False):
     connection = pymysql.connect(
