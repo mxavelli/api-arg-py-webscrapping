@@ -49,7 +49,7 @@ def get_cop_currency():
     website = 'https://www.dolarhoy.co/'
     request_web = requests.get(website)
     soup = BeautifulSoup(request_web.text, 'html.parser')
-    h3_element = soup.find('h3', string="Price in Exchange Houses")
+    h3_element = soup.find('h3', string="Precio en Casas de Cambio")
     row_element = h3_element.find_next_sibling()
     cols_elements = row_element.findChildren('div')
     for child in cols_elements:
