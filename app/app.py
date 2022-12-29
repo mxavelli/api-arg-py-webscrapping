@@ -1,6 +1,6 @@
 from flask import Flask
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, date
 import os
 import requests
 import json
@@ -29,7 +29,8 @@ def execute_query(query, params=[], should_return=False):
 
 country_code_dict = {
     'ARG': 'ARG',
-    'COP': 'COP'
+    'COP': 'COP',
+    'BRL': 'BRL'
 }
 
 
@@ -89,6 +90,17 @@ def get_arg_currency():
     insert_database(values, country_code_dict['ARG'])
     return values
 
+def get_brl_currency():
+    values = {}
+    date_now = date.today()
+    website = 'https://www3.bcb.gov.br/bc_moeda/rest/converter/1/1/220/790/{}'.format(date_now)
+    request_web = requests.get(website)
+    xml_parsed = BeautifulSoup(request_web.text, 'html.parser')
+    valor_convertido_element = xml_parsed.findChildren()
+    value = valor_convertido_element[0].get_text()
+    values['value'] = value
+    insert_database(values, country_code_dict['BRL'])
+    return values
 
 @app.route('/api/v1/argcurrency/json', methods=['GET'])
 def arg_currency_json():
@@ -113,6 +125,17 @@ def get_cop_csv():
     values = get_currency_from_table(country_code_dict['COP'])
     return convert_dict_to_csv(values)
 
+@app.route('/api/v1/brl/json', methods=['GET'])
+def get_cop_json():
+    values = get_currency_from_table(country_code_dict['BRL'])
+    return json.dumps(values)
+
+
+@app.route('/api/v1/brl/csv', methods=['GET'])
+def get_cop_csv():
+    values = get_currency_from_table(country_code_dict['BRL'])
+    return convert_dict_to_csv(values)
+
 
 @app.route('/api/v1/argcurrency/update', methods=['GET'])
 def arg_currency_update():
@@ -122,6 +145,10 @@ def arg_currency_update():
 @app.route('/api/v1/cop/update', methods=['GET'])
 def cop_update():
     return get_cop_currency()
+
+@app.route('/api/v1/brl/update', methods=['GET'])
+def cop_update():
+    return get_brl_currency()
 
 
 if __name__ == '__main__':
