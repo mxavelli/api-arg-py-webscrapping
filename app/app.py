@@ -92,7 +92,7 @@ def get_arg_currency():
 
 
 def get_brl_currency():
-    values = {} #quic
+    values = {}
     date_now = date.today()
     website = 'https://www3.bcb.gov.br/bc_moeda/rest/converter/1/1/220/790/{}'.format(date_now)
     request_web = requests.get(website)
@@ -156,7 +156,7 @@ def brl_update():
 
 @app.route('/', methods=['GET'])
 def working():
-    return "working v3"
+    return "It's working!"
 
 
 if __name__ == '__main__':
