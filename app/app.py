@@ -156,7 +156,7 @@ def brl_update():
 
 @app.route('/', methods=['GET'])
 def working():
-    return "working"
+    return "working v2"
 
 
 if __name__ == '__main__':
