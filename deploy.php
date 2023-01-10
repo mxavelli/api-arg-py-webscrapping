@@ -32,12 +32,16 @@ if ($ref == 'refs/heads/main' || $should_override == true) {
 	$secondMsg = 'Executing source cmd';
 	error_log($secondMsg);
 	echo $secondMsg;
-	exec($sourceCmd);
+	$status = shell_exec($sourceCmd);
+	error_log($status);
+	echo $status;
 
 	// Third command is to update the file
 	$restartCmd = $_SERVER['RESTART_FILE_PATH'];
 	$thirdMsg = 'Executing restart cmd';
 	error_log($thirdMsg);
 	echo $thirdMsg;
-	exec("echo $(date) > " . $restartCmd);
+	$status = shell_exec("echo $(date) > " . $restartCmd);
+	error_log($status);
+	echo $status;
 }
