@@ -16,6 +16,7 @@ country_code_dict = {
     'COP': 'COP',
     'BRL': 'BRL',
     'VEN': 'VEN',
+    'DOP_POPU': 'DOP_POPU',
 }
 
 
@@ -36,15 +37,13 @@ def execute_query(query, params=[], should_return=False):
 
 
 def insert_database(jsonparam, country_code):
-    try:
-        jsonparam['date'] = str(datetime.now())
-        execute_query(
-            "INSERT INTO currency (json, country_code) VALUES (%s, %s)",
-            [json.dumps(jsonparam), country_code]
-        )
-        return jsonparam
-    except Exception as e:
-        return {'Status': 'Error', 'Detail': str(e)}
+
+    jsonparam['date'] = str(datetime.now())
+    execute_query(
+        "INSERT INTO currency (json, country_code) VALUES (%s, %s)",
+        [json.dumps(jsonparam), country_code]
+    )
+    return jsonparam
 
 
 def convert_dict_to_csv(dict_var):
@@ -150,6 +149,41 @@ def get_cop_currency():
         return {'Status': 'Error', 'Detail': str(e)}
 
 
+def get_dop_popular_currency():
+    try:
+        url = 'https://popularenlinea.com/_api/web/lists/getbytitle(%27Rates%27)/items?$filter=ItemID%20eq%20%271%27'
+        endpointUrl = 'https://popularscrapper.francis.center/insert'
+
+        headers = {
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/107.0.0.0 '
+                          'Safari/537.36',
+            'user': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,'
+                    'application/signed-exchange;v=b3;q=0.9',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept': 'application/json'
+        }
+
+        values = {}
+        x = requests.get(url, headers=headers)
+        t = json.loads(x.text)
+        dic = t['value']
+
+        for d in dic:
+            values = d
+
+        data = {
+            **values,
+            "Compra": values['DollarBuyRate'],
+            "Venta": values['DollarSellRate']
+        }
+
+        insert_database(data, country_code_dict['DOP_POPU'])
+        return data
+    except Exception as e:
+        return {'Status': 'Error', 'Detail': str(e)}
+
+
 @app.route('/api/v1/arg/csv', methods=['GET'])
 def arg_currency_csv():
     values = get_currency_from_table(country_code_dict['ARG'])
@@ -216,6 +250,23 @@ def get_ven_json():
 @app.route('/api/v1/ven/update', methods=['GET'])
 def ven_update():
     return get_ven_currency()
+
+
+@app.route('/api/v1/dop_popu/csv', methods=['GET'])
+def get_dop_popular_csv():
+    values = get_currency_from_table((country_code_dict['DOP']))
+    return convert_dict_to_csv(values)
+
+
+@app.route('/api/v1/dop_popu/json', methods=['GET'])
+def get_dop_popular_json():
+    values = get_currency_from_table(country_code_dict['DOP_POPU'])
+    return json.dumps(values)
+
+
+@app.route('/api/v1/dop_popu/update', methods=['GET'])
+def dop_popular_update():
+    return get_dop_popular_currency()
 
 
 @app.route('/', methods=['GET'])
