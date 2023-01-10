@@ -17,6 +17,7 @@ country_code_dict = {
     'BRL': 'BRL',
     'VEN': 'VEN',
     'DOP_POPU': 'DOP_POPU',
+    'DOP_BANRE': 'DOP_BANRE',
 }
 
 return_methods = {
@@ -157,8 +158,6 @@ def get_cop_currency():
 def get_dop_popular_currency():
     try:
         url = 'https://popularenlinea.com/_api/web/lists/getbytitle(%27Rates%27)/items?$filter=ItemID%20eq%20%271%27'
-        endpointUrl = 'https://popularscrapper.francis.center/insert'
-
         headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                           'Chrome/107.0.0.0 '
@@ -188,6 +187,15 @@ def get_dop_popular_currency():
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
+def get_dop_banre_currency():
+    try:
+        url = 'https://www.banreservas.com/_layouts/15/SharePointAPI/ObtenerTasas.ashx'
+        x = requests.get(url)
+        t = json.loads(x.text)
+        return insert_database(t, country_code_dict['DOP_BANRE'])
+    except Exception as e:
+        return {'Status': 'Error', 'Detail': str(e)}
+
 
 functions_dict = {
     country_code_dict['BRL']: get_brl_currency,
@@ -195,6 +203,7 @@ functions_dict = {
     country_code_dict['COP']: get_cop_currency,
     country_code_dict['ARG']: get_arg_currency,
     country_code_dict['DOP_POPU']: get_dop_popular_currency,
+    country_code_dict['DOP_BANRE']: get_dop_banre_currency,
 }
 
 @app.route('/', methods=['GET'])
