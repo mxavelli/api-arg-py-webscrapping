@@ -45,6 +45,7 @@ def execute_query(query, params=[], should_return=False):
 def insert_database(jsonparam, country_code):
 
     jsonparam['date'] = str(datetime.utcnow())
+    jsonparam['country_code'] = country_code
     execute_query(
         "INSERT INTO currency (json, country_code) VALUES (%s, %s)",
         [json.dumps(jsonparam), country_code]
