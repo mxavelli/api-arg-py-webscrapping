@@ -84,8 +84,7 @@ def get_arg_currency():
         for p_element in get_p_elements:
             span = p_element.span.extract()
             values[span.get_text()] = float(p_element.get_text())
-        insert_database(values, country_code_dict['ARG'])
-        return values
+        return insert_database(values, country_code_dict['ARG'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
@@ -113,8 +112,7 @@ def get_ven_currency():
             'Compra': a_dictionary['USD'],
             'Venta': a_dictionary['USD'],
         }
-        insert_database(values, country_code_dict['VEN'])
-        return values
+        return insert_database(values, country_code_dict['VEN'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
@@ -130,8 +128,7 @@ def get_brl_currency():
         value = valor_convertido_element[0].get_text()
         values['Compra'] = float(value)
         values['Venta'] = float(value)
-        insert_database(values, country_code_dict['BRL'])
-        return values
+        return insert_database(values, country_code_dict['BRL'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
@@ -149,8 +146,7 @@ def get_cop_currency():
             text = child.find('small').get_text().replace('Te venden', 'Venta').replace('Te compran', 'Compra')
             value = child.find('span').get_text()
             values[text] = float(sub("[^\d\.]", "", value))
-        insert_database(values, country_code_dict['COP'])
-        return values
+        return insert_database(values, country_code_dict['COP'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
@@ -182,8 +178,7 @@ def get_dop_popular_currency():
             "Venta": values['DollarSellRate']
         }
 
-        insert_database(data, country_code_dict['DOP_POPU'])
-        return data
+        return insert_database(data, country_code_dict['DOP_POPU'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
@@ -250,6 +245,21 @@ def update_currency(currency):
 
     return functions_dict[currency]()
 
+
+@app.route('/api/v1/update_all', methods=['GET'])
+def update_all_currencies():
+    keys = functions_dict.keys()
+    values = {}
+    for key in keys:
+        try:
+            result = functions_dict[key]()
+            values[key] = result
+        except Exception as e:
+            values[key] = {
+                'error': str(e)
+            }
+
+    return json.dumps(values)
 
 if __name__ == '__main__':
     app.run()
