@@ -189,7 +189,9 @@ def get_dop_banre_currency():
         values = json.loads(request.text)
         values = {
             **values,
-            **values['info']
+            **values['info'],
+            'Compra': values['compraUS'],
+            'Venta': values['ventaUS'],
         }
         del values['info']
         return insert_database(values, country_code_dict['DOP_BANRE'])
@@ -213,6 +215,7 @@ def working():
 
 @app.route('/api/v1/<currency>/<return_method>', methods=['GET'])
 def get_currency_as_data(currency, return_method):
+    currency = currency.upper()
     if currency not in country_code_dict:
         return json.dumps({
             'error': True,
