@@ -239,6 +239,7 @@ def get_currency_as_data(currency, return_method):
 
 @app.route('/api/v1/<currency>/update', methods=['GET'])
 def update_currency(currency):
+    currency = currency.upper()
     if currency not in country_code_dict:
         return json.dumps({
             'error': True,
