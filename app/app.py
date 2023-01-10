@@ -190,9 +190,14 @@ def get_dop_popular_currency():
 def get_dop_banre_currency():
     try:
         url = 'https://www.banreservas.com/_layouts/15/SharePointAPI/ObtenerTasas.ashx'
-        x = requests.get(url)
-        t = json.loads(x.text)
-        return insert_database(t, country_code_dict['DOP_BANRE'])
+        request = requests.get(url)
+        values = json.loads(request.text)
+        values = {
+            **values,
+            **values['info']
+        }
+        del values['info']
+        return insert_database(values, country_code_dict['DOP_BANRE'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
