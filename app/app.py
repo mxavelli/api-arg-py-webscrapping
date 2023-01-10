@@ -65,7 +65,7 @@ def convert_dict_to_csv(dict_var):
 
 def get_currency_from_table(country_code):
     try:
-        query = "SELECT json FROM currency WHERE country_code='{}' ORDER BY id DESC LIMIT 1".format(country_code)
+        query = "select json from currency where json_extract(json, '$.country_code') = '{}' order by json_extract(json, '$.date') desc limit 1".format(country_code)
         results = execute_query(
             query=query,
             should_return=True
