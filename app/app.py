@@ -19,6 +19,11 @@ country_code_dict = {
     'DOP_POPU': 'DOP_POPU',
 }
 
+return_methods = {
+    'json': 'json',
+    'csv': 'csv',
+}
+
 
 def execute_query(query, params=[], should_return=False):
     connection = pymysql.connect(
@@ -184,94 +189,52 @@ def get_dop_popular_currency():
         return {'Status': 'Error', 'Detail': str(e)}
 
 
-@app.route('/api/v1/arg/csv', methods=['GET'])
-def arg_currency_csv():
-    values = get_currency_from_table(country_code_dict['ARG'])
-    return convert_dict_to_csv(values)
-
-
-@app.route('/api/v1/arg/json', methods=['GET'])
-def arg_currency_json():
-    values = get_currency_from_table(country_code_dict['ARG'])
-    return json.dumps(values)
-
-
-@app.route('/api/v1/arg/update', methods=['GET'])
-def arg_currency_update():
-    return get_arg_currency()
-
-
-@app.route('/api/v1/cop/csv', methods=['GET'])
-def get_cop_csv():
-    values = get_currency_from_table(country_code_dict['COP'])
-    return convert_dict_to_csv(values)
-
-
-@app.route('/api/v1/cop/json', methods=['GET'])
-def get_cop_json():
-    values = get_currency_from_table(country_code_dict['COP'])
-    return json.dumps(values)
-
-
-@app.route('/api/v1/cop/update', methods=['GET'])
-def cop_update():
-    return get_cop_currency()
-
-
-@app.route('/api/v1/brl/csv', methods=['GET'])
-def get_brl_csv():
-    values = get_currency_from_table((country_code_dict['BRL']))
-    return convert_dict_to_csv(values)
-
-
-@app.route('/api/v1/brl/json', methods=['GET'])
-def get_brl_json():
-    values = get_currency_from_table(country_code_dict['BRL'])
-    return json.dumps(values)
-
-
-@app.route('/api/v1/brl/update', methods=['GET'])
-def brl_update():
-    return get_brl_currency()
-
-
-@app.route('/api/v1/ven/csv', methods=['GET'])
-def get_ven_csv():
-    values = get_currency_from_table((country_code_dict['VEN']))
-    return convert_dict_to_csv(values)
-
-
-@app.route('/api/v1/ven/json', methods=['GET'])
-def get_ven_json():
-    values = get_currency_from_table(country_code_dict['VEN'])
-    return json.dumps(values)
-
-
-@app.route('/api/v1/ven/update', methods=['GET'])
-def ven_update():
-    return get_ven_currency()
-
-
-@app.route('/api/v1/dop_popu/csv', methods=['GET'])
-def get_dop_popular_csv():
-    values = get_currency_from_table((country_code_dict['DOP']))
-    return convert_dict_to_csv(values)
-
-
-@app.route('/api/v1/dop_popu/json', methods=['GET'])
-def get_dop_popular_json():
-    values = get_currency_from_table(country_code_dict['DOP_POPU'])
-    return json.dumps(values)
-
-
-@app.route('/api/v1/dop_popu/update', methods=['GET'])
-def dop_popular_update():
-    return get_dop_popular_currency()
-
+functions_dict = {
+    country_code_dict['BRL']: get_brl_currency,
+    country_code_dict['VEN']: get_ven_currency,
+    country_code_dict['COP']: get_cop_currency,
+    country_code_dict['ARG']: get_arg_currency,
+    country_code_dict['DOP_POPU']: get_dop_popular_currency,
+}
 
 @app.route('/', methods=['GET'])
 def working():
     return "It's working!"
+
+
+@app.route('/api/v1/<currency>/<return_method>', methods=['GET'])
+def get_currency_as_data(currency, return_method):
+    if currency not in country_code_dict:
+        return json.dumps({
+            'error': True,
+            'message': 'Currency "{}" not found. Please find available currencies in this json.'.format(currency),
+            'data': list(country_code_dict.keys())
+        })
+
+    if return_method not in return_methods:
+        return json.dumps({
+            'error': True,
+            'message': 'Return Method "{}" not found. Please find available return methods in this json.'.format(return_method),
+            'data': list(return_methods.keys())
+        })
+
+    values = get_currency_from_table(country_code_dict[currency])
+    if return_methods[return_method] == return_methods['json']:
+        return json.dumps(values)
+    if return_methods[return_method] == return_methods['csv']:
+        return convert_dict_to_csv(values)
+
+
+@app.route('/api/v1/<currency>/update', methods=['GET'])
+def update_currency(currency):
+    if currency not in country_code_dict:
+        return json.dumps({
+            'error': True,
+            'message': 'Currency "{}" not found. Please find available currencies in this json.'.format(currency),
+            'data': list(country_code_dict.keys())
+        })
+
+    return functions_dict[currency]()
 
 
 if __name__ == '__main__':
