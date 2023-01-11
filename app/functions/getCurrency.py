@@ -85,30 +85,37 @@ def get_cop_currency():
 
 def get_dop_popular_currency():
     try:
-        url = 'https://popularenlinea.com/_api/web/lists/getbytitle(%27Rates%27)/items?$filter=ItemID%20eq%20%271%27'
+        url = 'https://www.infodolar.com.do/precio-dolar-entidad-banco-popular.aspx'
         headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                          'Chrome/107.0.0.0 '
+                          'Chrome/108.0.0.0 '
                           'Safari/537.36',
             'user': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,'
                     'application/signed-exchange;v=b3;q=0.9',
             'accept-encoding': 'gzip, deflate, br',
-            'accept': 'application/json'
+            'accept': 'application/json',
+            'accept-language': 'en,es-ES;q=0.9,es;q=0.8',
+            'pragma': 'no-cache',
+            'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'sec-fetch-dest': 'document',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-site': 'none',
+            'sec-fetch-user': '?1',
+            'upgrade-insecure-requests': '1'
+
         }
         values = {}
         x = requests.get(url, headers=headers)
-        t = json.loads(x.text)
-        dic = t['value']
-
-        for d in dic:
-            values = d
-
-        data = {
-            **values,
-            "Compra": values['DollarBuyRate'],
-            "Venta": values['DollarSellRate']
-        }
-        return insert_database(data, country_code_dict['DOP_POPU'])
+        soup = BeautifulSoup(x.text, 'html.parser')
+        headers = soup.body.select('table tr:nth-child(1) th:not(:first-of-type, :last-of-type)')
+        columns = soup.body.select('table tr:nth-child(2) td:not(:first-of-type, :last-of-type)')
+        for index, column in enumerate(columns):
+            header = headers[index].text
+            value = column.get('data-order', column.findAll(text=True, recursive=False))
+            values[header] = float(sub("[^\d\.]", "", value))
+        return insert_database(values, country_code_dict['DOP_POPU'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
