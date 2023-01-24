@@ -1,7 +1,6 @@
 from app.functions.config import country_code_dict
 from app.functions.database import insert_database
 from bs4 import BeautifulSoup
-from datetime import date
 from re import sub
 import requests
 import json
@@ -51,15 +50,14 @@ def get_ven_currency():
 
 def get_brl_currency():
     try:
-        values = {}
-        date_now = date.today()
-        website = 'https://www3.bcb.gov.br/bc_moeda/rest/converter/1/1/220/790/{}'.format(date_now)
-        request_web = requests.get(website)
-        xml_parsed = BeautifulSoup(request_web.text, 'html.parser')
-        valor_convertido_element = xml_parsed.findChildren()
-        value = valor_convertido_element[0].get_text()
-        values['Compra'] = float(value)
-        values['Venta'] = float(value)
+        website = 'https://www.bcb.gov.br/api/servico/sitebcb/indicadorCambio'
+        r = requests.get(website)
+        data = dict(r.json())
+        compra_venta = data['conteudo'][1]
+        values = {
+            'Compra': compra_venta['valorCompra'],
+            'Venta': compra_venta['valorVenda'],
+        }
         return insert_database(values, country_code_dict['BRL'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
