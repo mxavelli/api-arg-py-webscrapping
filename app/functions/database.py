@@ -23,10 +23,10 @@ def execute_query(query, params=[], should_return=False):
 
 def insert_database(jsonparam, country_code):
 
-    jsonparam['date'] = str(datetime.utcnow())
+    jsonparam['date'] = str(datetime.utcnow().replace(microsecond=0))
     jsonparam['country_code'] = country_code
-    jsonparam['date_dop'] = str(datetime.utcnow() - timedelta(hours=4))
-    jsonparam['date_arg'] = str(datetime.utcnow() - timedelta(hours=3))
+    jsonparam['date_dop'] = str(datetime.utcnow().replace(microsecond=0) - timedelta(hours=4))
+    jsonparam['date_arg'] = str(datetime.utcnow().replace(microsecond=0) - timedelta(hours=3))
     execute_query(
         "INSERT INTO currency (json, country_code) VALUES (%s, %s)",
         [json.dumps(jsonparam), country_code]
