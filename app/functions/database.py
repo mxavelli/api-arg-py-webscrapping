@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timedelta
 import json
 import pymysql.cursors
 import os
@@ -24,6 +25,8 @@ def insert_database(jsonparam, country_code):
 
     jsonparam['date'] = str(datetime.utcnow())
     jsonparam['country_code'] = country_code
+    jsonparam['date_dop'] = str(datetime.utcnow() - timedelta(hours=4))
+    jsonparam['date_arg'] = str(datetime.utcnow() - timedelta(hours=3))
     execute_query(
         "INSERT INTO currency (json, country_code) VALUES (%s, %s)",
         [json.dumps(jsonparam), country_code]
