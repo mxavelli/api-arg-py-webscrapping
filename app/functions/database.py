@@ -45,3 +45,14 @@ def get_currency_from_table(country_code):
         return json.loads(results[0]['json'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
+
+def get_all_currency_from_table():
+    try:
+        query = "select country_code, json from currency join (select MAX(id) as id from currency group by country_code) cmax on cmax.id = currency.id;"
+        results = execute_query(
+            query=query,
+            should_return=True
+        )
+        return json.loads(results[0])
+    except Exception as e:
+        return {'Status': 'Error', 'Detail': str(e)}
