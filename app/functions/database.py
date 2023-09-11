@@ -53,7 +53,6 @@ def get_all_currency_from_table():
             query=query,
             should_return=True
         )
-        results[0]['json'] = json.loads(results[0]['json'])
-        return results[0]
+        return results
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
