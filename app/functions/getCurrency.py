@@ -20,6 +20,20 @@ def get_arg_currency():
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
+def get_arg_oficial_currency():
+    try:
+        values = {}
+        website = 'https://dolarhoy.com/i/cotizaciones/dolar-oficial'
+        request_web = requests.get(website)
+        soup = BeautifulSoup(request_web.text, 'html.parser')
+        get_p_elements = soup.body.div.find_all('p')
+        for p_element in get_p_elements:
+            span = p_element.span.extract()
+            values[span.get_text()] = float(p_element.get_text())
+        return insert_database(values, country_code_dict['ARG_OFICIAL'])
+    except Exception as e:
+        return {'Status': 'Error', 'Detail': str(e)}
+
 
 def get_ven_currency():
     try:
@@ -140,6 +154,7 @@ functions_dict = {
     country_code_dict['VEN']: get_ven_currency,
     country_code_dict['COP']: get_cop_currency,
     country_code_dict['ARG']: get_arg_currency,
+    country_code_dict['ARG_OFICIAL']: get_arg_oficial_currency,
     country_code_dict['DOP_POPU']: get_dop_popular_currency,
     country_code_dict['DOP_BANRE']: get_dop_banre_currency,
 }
