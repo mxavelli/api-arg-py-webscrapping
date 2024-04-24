@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from app.functions.config import country_code_dict, return_methods
+from app.functions.config import country_code_dict, return_methods, country_code_label
 from app.functions.convertToCsv import convert_dict_to_csv
 from app.functions.database import get_currency_from_table, get_all_currency_from_table
 from app.functions.getCurrency import functions_dict
@@ -71,6 +71,9 @@ def update_all_currencies():
 
     return json.dumps(values)
 
+@app.route('/api/v1/get_currencies_label', methods=['GET'])
+def get_currencies_label():
+    return json.dumps(country_code_label)
 
 if __name__ == '__main__':
     app.run()
