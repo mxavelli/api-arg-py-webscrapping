@@ -1,4 +1,4 @@
-from app.functions.config import country_code_dict
+from app.functions.config import country_code_dict, headers
 from app.functions.database import insert_database
 from bs4 import BeautifulSoup
 from re import sub
@@ -98,33 +98,14 @@ def get_cop_currency():
 def get_dop_popular_currency():
     try:
         url = 'https://www.infodolar.com.do/precio-dolar-entidad-banco-popular.aspx'
-        headers = {
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                          'Chrome/108.0.0.0 '
-                          'Safari/537.36',
-            'user': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,'
-                    'application/signed-exchange;v=b3;q=0.9',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept': 'application/json',
-            'accept-language': 'en,es-ES;q=0.9,es;q=0.8',
-            'pragma': 'no-cache',
-            'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            'sec-fetch-dest': 'document',
-            'sec-fetch-mode': 'navigate',
-            'sec-fetch-site': 'none',
-            'sec-fetch-user': '?1',
-            'upgrade-insecure-requests': '1'
 
-        }
         values = {}
         x = requests.get(url, headers=headers)
         soup = BeautifulSoup(x.text, 'html.parser')
-        headers = soup.body.select('table tr:nth-child(1) th:not(:first-of-type, :last-of-type)')
+        column_headers = soup.body.select('table tr:nth-child(1) th:not(:first-of-type, :last-of-type)')
         columns = soup.body.select('table tr:nth-child(2) td:not(:first-of-type, :last-of-type)')
         for index, column in enumerate(columns):
-            header = headers[index].text
+            header = column_headers[index].text
             value = column.get('data-order', column.findAll(text=True, recursive=False))
             values[header] = float(sub("[^\d\.]", "", value))
         return insert_database(values, country_code_dict['DOP_POPU'])
@@ -149,6 +130,23 @@ def get_dop_banre_currency():
         return {'Status': 'Error', 'Detail': str(e)}
 
 
+def get_pen_currency():
+    try:
+        url = 'https://www.eleconomista.es/cruce/USDPEN'
+        request = requests.get(url, headers=headers)
+        soup = BeautifulSoup(request.text, 'html.parser')
+        text = soup.body.select('div:has(> .price-row) > span.last-value:nth-child(2)')[0].text  # 3,7521 /$ expected
+        text = ''.join(char for char in text if char.isdigit() or char == ',')
+        text = text.replace(',', '.')
+
+        values = {
+            'Compra': text,
+            'Venta': text
+        }
+        return insert_database(values, country_code_dict['PEN'])
+    except Exception as e:
+        return {'Status': 'Error', 'Detail': str(e)}
+
 functions_dict = {
     country_code_dict['BRL']: get_brl_currency,
     country_code_dict['VEN']: get_ven_currency,
@@ -157,4 +155,5 @@ functions_dict = {
     country_code_dict['ARG_OFICIAL']: get_arg_oficial_currency,
     country_code_dict['DOP_POPU']: get_dop_popular_currency,
     country_code_dict['DOP_BANRE']: get_dop_banre_currency,
+    country_code_dict['PEN']: get_pen_currency,
 }
