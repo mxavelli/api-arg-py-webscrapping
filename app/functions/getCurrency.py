@@ -100,7 +100,7 @@ def get_dop_popular_currency():
         url = 'https://www.infodolar.com.do/precio-dolar-entidad-banco-popular.aspx'
 
         values = {}
-        x = requests.get(url, headers=headers)
+        x = requests.get(url)
         soup = BeautifulSoup(x.text, 'html.parser')
         column_headers = soup.body.select('table tr:nth-child(1) th:not(:first-of-type, :last-of-type)')
         columns = soup.body.select('table tr:nth-child(2) td:not(:first-of-type, :last-of-type)')
