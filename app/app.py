@@ -4,6 +4,7 @@ from app.functions.config import country_code_dict, return_methods, country_code
 from app.functions.convertToCsv import convert_dict_to_csv
 from app.functions.database import get_currency_from_table, get_all_currency_from_table
 from app.functions.getCurrency import functions_dict
+from app.functions.createGraphic import create_loan_graphic
 import json
 
 app = Flask(__name__)
@@ -74,6 +75,15 @@ def update_all_currencies():
 @app.route('/api/v1/get_currencies_label', methods=['GET'])
 def get_currencies_label():
     return jsonify(country_code_label)
+
+
+@app.route('/api/v1/graphic/<amount>/<monthly_interest_rate>', methods=['GET'])
+def get_graphic(amount, monthly_interest_rate):
+    return json.dumps({
+        'image_png': create_loan_graphic(float(amount), float(monthly_interest_rate)),
+        'amount': amount,
+        'monthly_interest_rate': monthly_interest_rate
+    })
 
 if __name__ == '__main__':
     app.run()
