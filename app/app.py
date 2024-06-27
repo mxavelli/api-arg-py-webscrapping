@@ -80,9 +80,10 @@ def get_currencies_label():
 @app.route('/api/v1/graphic/<amount>/<monthly_interest_rate>', methods=['GET'])
 def get_graphic(amount, monthly_interest_rate):
     return json.dumps({
-        'image_png': create_loan_graphic(float(amount), float(monthly_interest_rate)),
+        'image_png': create_loan_graphic(float(amount), float(monthly_interest_rate) / 100),
         'amount': amount,
-        'monthly_interest_rate': monthly_interest_rate
+        'monthly_interest_rate': monthly_interest_rate,
+        'converted_monthly_interest_rate': float(monthly_interest_rate) / 100
     })
 
 if __name__ == '__main__':
