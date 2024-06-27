@@ -22,6 +22,11 @@ def create_loan_graphic(principal_amount, annual_interest_rate):
     plt.grid(color='gray', linestyle='--', linewidth=0.5)
     plt.tight_layout()
 
+    # Adjusting axis limits to ensure annotations fit within the plot
+    max_payment = max(monthly_payments)
+    plt.xlim(0, 35)
+    plt.ylim(0, max_payment * 1.5)
+
     # Annotating the monthly payment values
     for i, payment in enumerate(monthly_payments):
         plt.annotate(f"${payment:,.2f}",
