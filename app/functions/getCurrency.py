@@ -78,6 +78,8 @@ def get_brl_currency():
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
+def clean_number(numberToUse):
+    return sub("[^\d\.]", "", numberToUse)
 
 def get_cop_currency():
     try:
@@ -91,7 +93,11 @@ def get_cop_currency():
         for child in cols_elements:
             text = child.find('small').get_text().replace('Te venden', 'Venta').replace('Te compran', 'Compra')
             value = child.find('span').get_text()
-            values[text] = float(sub("[^\d\.]", "", value))
+            values[text] = float(clean_number(value))
+        # Add dollar today element too
+        dolar_hoy_element = soup.find('h1', string="Dolar Hoy")
+        precio = float(clean_number(dolar_hoy_element.find_next_sibling('span').get_text()))
+        values['Dolar Hoy'] = precio
         return insert_database(values, country_code_dict['COP'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
