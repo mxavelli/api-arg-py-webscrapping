@@ -7,6 +7,7 @@ country_code_dict = {
     'DOP_POPU': 'DOP_POPU',
     'DOP_BANRE': 'DOP_BANRE',
     'PEN': 'PEN',
+    'CLP': 'CLP',
 }
 
 return_methods = {
