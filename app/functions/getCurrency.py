@@ -176,6 +176,24 @@ def get_clp_currency():
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
 
+
+def get_uyu_currency():
+    try:
+        url = 'https://www.eleconomista.es/cruce/USDUYU'
+        request = requests.get(url, headers=headers)
+        soup = BeautifulSoup(request.text, 'html.parser')
+        text = soup.body.select('div:has(> .price-row) > span.last-value:nth-child(2)')[0].text
+        text = ''.join(char for char in text if char.isdigit() or char == ',')
+        text = text.replace(',', '.')
+
+        values = {
+            'Compra': text,
+            'Venta': text
+        }
+        return insert_database(values, country_code_dict['UYU'])
+    except Exception as e:
+        return {'Status': 'Error', 'Detail': str(e)}
+
 functions_dict = {
     country_code_dict['BRL']: get_brl_currency,
     country_code_dict['VEN']: get_ven_currency,
@@ -186,4 +204,5 @@ functions_dict = {
     country_code_dict['DOP_BANRE']: get_dop_banre_currency,
     country_code_dict['PEN']: get_pen_currency,
     country_code_dict['CLP']: get_clp_currency,
+    country_code_dict['UYU']: get_uyu_currency,
 }

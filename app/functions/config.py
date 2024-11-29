@@ -8,6 +8,7 @@ country_code_dict = {
     'DOP_BANRE': 'DOP_BANRE',
     'PEN': 'PEN',
     'CLP': 'CLP',
+    'UYU': 'UYU',
 }
 
 return_methods = {
