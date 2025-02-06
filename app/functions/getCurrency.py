@@ -36,7 +36,7 @@ def get_arg_oficial_currency():
         get_p_elements = soup.body.div.find_all('p')
         for p_element in get_p_elements:
             span = p_element.span.extract()
-            values[span.get_text()] = float(p_element.get_text())
+            values[span.get_text()] = float(p_element.get_text().replace(',', '.'))
         return insert_database(values, country_code_dict['ARG_OFICIAL'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
