@@ -126,16 +126,23 @@ def get_dop_popular_currency():
 
 def get_dop_banre_currency():
     try:
-        url = 'https://www.banreservas.com/_layouts/15/SharePointAPI/ObtenerTasas.ashx'
+        url = 'https://www.banreservas.com/'
         request = requests.get(url)
-        values = json.loads(request.text)
-        values = {
-            **values,
-            **values['info'],
-            'Compra': values['compraUS'],
-            'Venta': values['ventaUS'],
+        soup = BeautifulSoup(request.text, 'html.parser')
+        selectors = {
+            'Compra': '.tasacambio-compraUS',
+            'Venta': '.tasacambio-ventaUS'
         }
-        del values['info']
+
+        values = {}
+        for index, selector in selectors.items():
+            element = soup.body.select_one(selector)
+            if element:
+                values[index] = element.text.strip()
+            else:
+                raise ValueError(f"Element not found for selector: {selector}")
+                # values[index] = None  # or some default value
+
         return insert_database(values, country_code_dict['DOP_BANRE'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
