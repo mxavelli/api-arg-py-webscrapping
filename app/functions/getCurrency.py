@@ -108,17 +108,10 @@ def get_cop_currency():
 
 def get_dop_popular_currency():
     try:
-        url = 'https://www.infodolar.com.do/precio-dolar-entidad-banco-popular.aspx'
+        url = 'https://n8n.app.francis.center/webhook/6570cb43-96b4-44df-b25e-73f191cddc6f'
+        response = requests.get(url)
+        values = response.json()
 
-        values = {}
-        x = requests.get(url)
-        soup = BeautifulSoup(x.text, 'html.parser')
-        column_headers = soup.body.select('table tr:nth-child(1) th:not(:first-of-type, :last-of-type)')
-        columns = soup.body.select('table tr:nth-child(2) td:not(:first-of-type, :last-of-type)')
-        for index, column in enumerate(columns):
-            header = column_headers[index].text
-            value = column.get('data-order', column.findAll(text=True, recursive=False))
-            values[header] = float(sub("[^\d\.]", "", value))
         return insert_database(values, country_code_dict['DOP_POPU'])
     except Exception as e:
         return {'Status': 'Error', 'Detail': str(e)}
